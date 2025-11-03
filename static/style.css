@@ -1,0 +1,18 @@
+body{
+    background: grey;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}   
+
+h1{
+    text-align: center;
+}
+
+.main-text{
+    color: yellow;
+}
+
+
+.my-btn{
+    border: 3px solid red;
+}
