@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}">
 </head>
 <body>
-
+    {% include 'menu.html' %}
     <div class="container">
         <h1 class="main-text">{{article.title}}</h1>
         {% if article.image %}
