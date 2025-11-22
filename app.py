@@ -1,7 +1,15 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__) # Створюємо веб–додаток Flask
+app.config['UPLOAD_FOLDER'] = 'static/img'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def get_all_articles():
@@ -71,6 +79,14 @@ def add_comment(article_id, author_name, author_email, content):
     conn.commit()
     conn.close()
 
+def add_article(title, author, content, image, category_id):
+    conn = sqlite3.connect('blog.db')
+    cursor = conn.cursor()
+    cursor.execute('''INSERT INTO articles (title, author, content, image, category_id) 
+                      VALUES (?, ?, ?, ?, ?)''', [title, author, content, image, category_id])
+    conn.commit()
+    conn.close()
+
 
 @app.route("/") # Вказуємо url-адресу для виклику функції
 def index():
@@ -109,6 +125,34 @@ def category_page(category_id):
     articles = get_articles_by_category(category_id)
     categories = get_all_categories()
     return render_template('index.html', articles=articles, categories=categories)
+
+@app.route("/add_article", methods=['GET', 'POST'])
+def add_article_page():
+    categories = get_all_categories()
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        author = request.form.get('author')
+        content = request.form.get('content')
+        category_id = request.form.get('category_id')
+        
+        # Обробка зображення
+        image_filename = None
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                # Додаємо timestamp до імені файлу для унікальності
+                import time
+                filename = f"{int(time.time())}_{filename}"
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                image_filename = filename
+        
+        if title and author and content and category_id:
+            add_article(title, author, content, image_filename, category_id)
+            return redirect(url_for('index'))
+    
+    return render_template('add_article.html', categories=categories)
 
 
 if __name__ == "__main__":

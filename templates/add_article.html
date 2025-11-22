@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Додати статтю</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}">
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+</head>
+<body>
+    {% include 'menu.html' %}
+    <div class="container mt-4">
+        <h1 class="main-text">Додати нову статтю</h1>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label">Заголовок *</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="author" class="form-label">Автор *</label>
+                <input type="text" class="form-control" id="author" name="author" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="category_id" class="form-label">Категорія *</label>
+                <select class="form-select" id="category_id" name="category_id" required>
+                    <option value="">Оберіть категорію</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="image" class="form-label">Зображення (необов'язково)</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            </div>
+            
+            <div class="mb-3">
+                <label for="content" class="form-label">Зміст статті *</label>
+                <textarea id="content" name="content"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Опублікувати статтю</button>
+            <a href="/" class="btn btn-secondary">Скасувати</a>
+        </form>
+    </div>
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#content'), {
+                toolbar: {
+                    items: [
+                        'heading', '|',
+                        'bold', 'italic', 'link', '|',
+                        'bulletedList', 'numberedList', '|',
+                        'blockQuote', 'insertTable', '|',
+                        'undo', 'redo'
+                    ]
+                },
+                language: 'uk'
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+</body>
+</html>
